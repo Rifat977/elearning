@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conceptual - Interactive Learning Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+    :root {
+      --primary-color: #0F172A;
+      --secondary-color: #1E293B;
+      --accent-color: #7C3AED;
+      --success-color: #10B981;
+      --warning-color: #F59E0B;
+      --error-color: #EF4444;
+      --text-color: #F8FAFC;
+      --text-muted: #94A3B8;
+      --bg-gradient-start: #0F172A;
+      --bg-gradient-end: #1E293B;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      min-height: 100vh;
+      color: var(--text-color);
+      line-height: 1.5;
+    }
+
+    .app-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .input-container {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .input-container:focus-within {
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.5);
+    }
+
+    .simulation-container {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      height: 550px;
+      min-height: 400px;
+      flex-grow: 1;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .trend-item {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .trend-item:hover {
+      background: rgba(30, 41, 59, 0.8);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .caption-container {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      margin-top: 1rem;
+      padding: 1rem;
+    }
+
+    .sound-button {
+      background: rgba(124, 58, 237, 0.2);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .sound-button:hover {
+      background: rgba(124, 58, 237, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .sound-button:active {
+      transform: translateY(1px);
+    }
+
+    .sound-button.playing {
+      background: var(--accent-color);
+      color: white;
+    }
+
+    .pulse-animation {
+      animation: pulse 2s infinite;
+    }
+
+    .btn {
+      background-color: var(--accent-color);
+      color: white;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #6D28D9;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .loader {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid var(--accent-color);
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+    }
+
+    @media (max-width: 768px) {
+      .app-container {
+        padding: 1rem;
+      }
+      
+      .simulation-container {
+        height: 400px;
+        min-height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container" x-data="app()">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-2 text-center md:text-left">
+        <span class="text-purple-500">Conceptual</span> 
+        <span class="text-sm text-purple-300 font-normal">Interactive Learning Platform</span>
+      </h1>
+      <p class="text-gray-400 text-center md:text-left">Visualize and understand any concept through interactive simulations</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-8 flex flex-col space-y-6">
+        <div class="simulation-container">
+          <div class="absolute inset-0 flex items-center justify-center" x-show="!simulationActive && !isLoading">
+            <div class="text-center px-6">
+              <div class="w-16 h-16 mx-auto text-purple-500 mb-4 opacity-50">🎯</div>
+              <p class="text-lg font-medium">Enter a prompt below to visualize any concept</p>
+              <p class="text-gray-400 text-sm mt-2">Try asking about physics, mathematics, biology, or any topic you're curious about!</p>
+            </div>
+          </div>
+          
+          <div class="absolute inset-0 flex flex-col items-center justify-center" x-show="isLoading">
+            <div class="loader mb-4"></div>
+            <p class="text-gray-300" id="loading-status">Generating visualization...</p>
+            <p class="text-gray-400 text-sm mt-2 max-w-md text-center">This might take a few moments as we contact our AI model</p>
+          </div>
+          
+          <div class="absolute inset-0 flex flex-col items-center justify-center bg-red-900 bg-opacity-20" x-show="apiError" x-cloak>
+            <div class="bg-red-800 bg-opacity-50 rounded-full p-3 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-white mb-2">Connection Error</h3>
+            <p class="text-gray-300 text-center max-w-md mb-4">We couldn't connect to our AI visualization service. Using local fallback visualizations instead.</p>
+            <button @click="apiError = false" class="text-sm text-red-300 hover:text-white border border-red-400 hover:border-white rounded-md px-3 py-1 transition-colors">Dismiss</button>
+          </div>
+          
+          <div class="h-full w-full" x-show="simulationActive && !isLoading" x-html="simulationContent" id="simulation-container"></div>
+        </div>
+
+        <div class="caption-container" x-show="simulationActive && !isLoading">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-medium text-purple-400">Explanation</h3>
+            <button 
+              @click="toggleVoice()" 
+              class="sound-button"
+              :class="{ 'playing': isVoicePlaying }"
+            >
+              <span x-text="isVoicePlaying ? '🔊 Stop' : '🔈 Listen'"></span>
+            </button>
+          </div>
+          <p class="text-gray-300" x-text="captionText"></p>
+        </div>
+        
+        <div class="input-container p-4">
+          <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+            <div class="flex-grow">
+              <label for="prompt-input" class="block text-sm font-medium text-gray-400 mb-1">Enter your prompt</label>
+              <input 
+                id="prompt-input" 
+                type="text" 
+                x-model="userPrompt" 
+                @keydown.enter="submitPrompt"
+                placeholder="Explain quantum entanglement with a visual simulation..." 
+                class="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              >
+            </div>
+            <div class="md:self-end">
+              <button 
+                @click="submitPrompt" 
+                x-bind:disabled="isLoading || userPrompt.trim() === ''"
+                x-bind:class="{'opacity-50 cursor-not-allowed': isLoading || userPrompt.trim() === '', 'hover:bg-purple-700': !(isLoading || userPrompt.trim() === '')}"
+                class="btn w-full md:w-auto flex items-center justify-center gap-2"
+              >
+                <span x-show="!isLoading">✨ Visualize</span>
+                <span x-show="isLoading" class="flex items-center justify-center gap-2">
+                  <div class="loader w-4 h-4"></div>
+                  Processing
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lg:col-span-4 flex flex-col space-y-6">
+        <div class="bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-md rounded-xl p-5 border border-gray-800">
+          <h3 class="font-medium text-lg mb-4 flex items-center gap-2">
+            <span>🔥</span> Popular Topics
+          </h3>
+          
+          <div class="space-y-3">
+            <template x-for="(trend, index) in trendingPrompts" :key="index">
+              <div 
+                @click="selectTrendingPrompt(trend)"
+                class="trend-item p-3 hover:bg-purple-900 hover:bg-opacity-20"
+              >
+                <p x-text="trend" class="text-sm"></p>
+              </div>
+            </template>
+          </div>
+        </div>
+        
+        <div class="bg-gray-900 bg-opacity-50 backdrop-filter backdrop-blur-md rounded-xl p-5 border border-gray-800">
+          <h3 class="font-medium text-lg mb-4 flex items-center gap-2">
+            <span>💡</span> Tips for Better Results
+          </h3>
+          
+          <ul class="text-sm text-gray-300 space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="text-purple-400">•</span>
+              <span>Be specific about what you want to visualize</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-purple-400">•</span>
+              <span>Mention if you want interactive elements</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-purple-400">•</span>
+              <span>Request "step-by-step" explanations for complex topics</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-purple-400">•</span>
+              <span>Specify your expertise level for tailored explanations</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-12 text-center text-sm text-gray-500">
+      <p>© 2025 Conceptual Learning Platform - All simulations are generated using AI</p>
+    </div>
+  </div>
+
+  <script>
+    function app() {
+      return {
+        userPrompt: '',
+        simulationContent: '',
+        captionText: '',
+        isLoading: false,
+        simulationActive: false,
+        isVoicePlaying: false,
+        speechSynthesis: null,
+        apiError: false,
+        trendingPrompts: [
+          'Explore how a solar eclipse occurs with an interactive simulation',
+          'Watch an animated visualization of DNA replication in real time',
+          'Discover an interactive periodic table with detailed element properties',
+          'Simulate and visualize planetary orbits across the solar system',
+          'Understand quantum computing through intuitive visual models',
+          'Learn machine learning fundamentals with interactive visualizations'
+        ],
+        
+        init() {
+          this.speechSynthesis = window.speechSynthesis;
+          
+          // Add event listener for when the simulation content changes
+          this.$watch('simulationContent', (value) => {
+            if (value) {
+              console.log("Simulation content updated");
+              this.ensureSimulationRendered();
+            }
+          });
+        },
+        
+        ensureSimulationRendered() {
+          setTimeout(() => {
+            const container = document.getElementById('simulation-container');
+            if (container) {
+              console.log("Simulation container found, content length:", 
+                          container.innerHTML ? container.innerHTML.length : 0);
+              
+              if (container.childElementCount === 0 && this.simulationContent) {
+                console.log("No child elements found, manually rendering content");
+                container.innerHTML = this.simulationContent;
+              }
+            } else {
+              console.error("Simulation container not found");
+            }
+          }, 200);
+        },
+        
+        submitPrompt() {
+          if (this.userPrompt.trim() === '' || this.isLoading) return;
+          
+          this.isLoading = true;
+          this.simulationActive = false;
+          this.apiError = false;
+          this.updateLoadingStatus("Connecting to AI for visualization...");
+          
+          this.fetchSimulationFromAPI(this.userPrompt)
+            .then(data => {
+              this.updateLoadingStatus("Generating visualization...");
+              console.log("API Response:", data);
+              
+              if (data) {
+                try {
+                  if (data.simulationContent) {
+                    console.log("Got simulationContent directly");
+                    this.simulationContent = data.simulationContent;
+                    this.captionText = data.caption || `This visualization represents ${this.userPrompt}.`;
+                    
+                    this.$nextTick(() => {
+                      this.ensureSimulationRendered();
+                    });
+                  } else if (data.response) {
+                    console.log("Got response in old format, parsing");
+                    const parsedData = this.parseAPIResponse(data.response);
+                    this.simulationContent = parsedData.simulationContent || this.getDefaultSimulation().content;
+                    this.captionText = parsedData.caption || `This visualization represents ${this.userPrompt}.`;
+                    
+                    this.$nextTick(() => {
+                      this.ensureSimulationRendered();
+                    });
+                  } else {
+                    console.error("Unexpected response format:", data);
+                    throw new Error("Unexpected response format");
+                  }
+                  
+                  console.log("Final simulationContent:", this.simulationContent);
+                } catch (error) {
+                  console.error("Error processing API response:", error);
+                  const fallback = this.getDefaultSimulation();
+                  this.simulationContent = fallback.content;
+                  this.captionText = `This visualization represents ${this.userPrompt}.`;
+                  this.apiError = true;
+                }
+              } else {
+                console.log("No data from API, using fallback");
+                const fallback = this.generateSimulation(this.userPrompt);
+                this.simulationContent = fallback.content;
+                this.captionText = fallback.caption;
+                this.apiError = true;
+              }
+              this.isLoading = false;
+              this.simulationActive = true;
+              
+              setTimeout(() => {
+                const container = document.querySelector('.simulation-container .h-full');
+                if (container && this.simulationContent) {
+                  console.log("Updating simulation container");
+                }
+              }, 100);
+            })
+            .catch(error => {
+              console.error("API call failed:", error);
+              const fallback = this.generateSimulation(this.userPrompt);
+              this.simulationContent = fallback.content;
+              this.captionText = fallback.caption;
+              this.isLoading = false;
+              this.simulationActive = true;
+              this.apiError = true;
+            });
+        },
+        
+        fetchSimulationFromAPI(prompt) {
+          const formattedPrompt = this.formatAPIPrompt(prompt);
+          const apiUrl = `${window.location.protocol}//${window.location.hostname}:7090/generate_simulation/?query=${encodeURIComponent(formattedPrompt)}`;
+          console.log("Calling API at:", apiUrl);
+          
+          const requestOptions = {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            credentials: 'include'
+          };
+          
+          return fetch(apiUrl, requestOptions)
+            .then(response => {
+              console.log("API response status:", response.status);
+              if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .catch(error => {
+              console.error("API fetch error:", error);
+              
+              if (error.message.includes('CORS') || error.name === 'TypeError') {
+                console.log("Using fallback due to CORS or network issue");
+                return null;
+              }
+              
+              return null;
+            });
+        },
+        
+        formatAPIPrompt(userPrompt) {
+          return `
+Create an interactive HTML and CSS visualization for: "${userPrompt}"
+
+Please return a JSON response with the following structure:
+{
+  "simulationContent": "<!-- HTML and CSS for the visualization, wrapped in a div with w-full h-full classes -->",
+  "caption": "Clear explanation of the concept being visualized"
+}
+
+Requirements for the visualization:
+1. Use pure HTML, CSS and inline JavaScript (no external libraries)
+2. Make it interactive and animated where appropriate
+3. Ensure all code is contained within a div with classes "w-full h-full"
+4. Use modern CSS features including flexbox, grid, and animations
+5. Optimize for educational clarity
+6. Ensure it works in a div with height: 550px
+7. Make the visualization colorful and visually engaging
+8. Include appropriate animations to demonstrate the concept
+9. Keep the code clean and well-structured
+10. For the caption, provide a clear and concise explanation (1-3 sentences)
+`;
+        },
+        
+        parseAPIResponse(responseText) {
+          // Try to extract JSON from the response text
+          try {
+            // First, attempt to parse the entire response as JSON
+            return JSON.parse(responseText);
+          } catch (error) {
+            // If that fails, try to find JSON within text
+            try {
+              const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                return JSON.parse(jsonMatch[0]);
+              }
+            } catch (innerError) {
+              console.error("Could not extract JSON from response", innerError);
+            }
+            
+            // If all parsing fails, return default structure
+            return {
+              simulationContent: null,
+              caption: null
+            };
+          }
+        },
+        
+        selectTrendingPrompt(prompt) {
+          this.userPrompt = prompt;
+          this.submitPrompt();
+        },
+        
+        // Add a visual loading indicator for the API call
+        updateLoadingStatus(message) {
+          const loadingElement = document.getElementById('loading-status');
+          if (loadingElement) {
+            loadingElement.textContent = message;
+          }
+        },
+        
+        toggleVoice() {
+          if (this.isVoicePlaying) {
+            if (this.speechSynthesis) {
+              this.speechSynthesis.cancel();
+            }
+            this.isVoicePlaying = false;
+          } else {
+            if (this.speechSynthesis) {
+              const utterance = new SpeechSynthesisUtterance(this.captionText);
+              utterance.onend = () => {
+                this.isVoicePlaying = false;
+              };
+              this.speechSynthesis.speak(utterance);
+              this.isVoicePlaying = true;
+            }
+          }
+        },
+        
+      };
+    }
+  </script>
+</body>
+</html>
