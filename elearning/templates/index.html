@@ -170,11 +170,19 @@
 <body>
   <div class="app-container" x-data="app()">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-2 text-center md:text-left">
-        <span class="text-purple-500">Conceptual</span> 
-        <span class="text-sm text-purple-300 font-normal">Interactive Learning Platform</span>
-      </h1>
-      <p class="text-gray-400 text-center md:text-left">Visualize and understand any concept through interactive simulations</p>
+      <!-- Navigation Bar -->
+      <nav class="flex justify-center mb-6 bg-gray-900 bg-opacity-80 rounded-xl px-6 py-4 shadow-lg">
+        <ul class="flex flex-wrap gap-6 text-base font-semibold">
+          <li><a href="/" class="text-gray-200 hover:text-purple-400 transition">Home Base</a></li>
+          <li><a href="/myth-check/" class="text-gray-200 hover:text-purple-400 transition">Myth Detective</a></li>
+          <li><a href="/visualize" class="text-purple-400 transition">See the Unseen</a></li>
+          <li><a href="/true_false_game/" class="text-gray-200 hover:text-purple-400 transition">Challenge Cards</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl font-bold mb-2 text-purple-400">Interactive Visualization Lab</h1>
+      <p class="text-gray-300">Explore, simulate, and understand any concept visually with AI-powered interactive simulations.<</p>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">

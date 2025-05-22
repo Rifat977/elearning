@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyCards - Your Digital Learning Platform</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f6f7fb;
+            color: #303545;
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 15px 50px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            color: #4257b2;
+            font-weight: bold;
+            font-size: 28px;
+            text-decoration: none;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin: 0 15px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #303545;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #4257b2;
+        }
+        
+        .auth-buttons button {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .login-btn {
+            background: transparent;
+            border: 1px solid #d9dde8;
+            color: #4257b2;
+            margin-right: 10px;
+        }
+        
+        .signup-btn {
+            background-color: #4257b2;
+            border: none;
+            color: white;
+        }
+        
+        /* Hero section */
+        .hero {
+            padding: 80px 50px;
+            text-align: center;
+            background-color: #4257b2;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+        
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 6px;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            color: #8a8d98;
+        }
+        
+        /* Study modes section */
+        .study-modes {
+            padding: 50px;
+            text-align: center;
+        }
+        
+        .study-modes h2 {
+            font-size: 32px;
+            margin-bottom: 40px;
+        }
+        
+        .modes-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .mode-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 25px;
+            width: 250px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .mode-icon {
+            background-color: #f1f1f8;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+        }
+        
+        .mode-card h3 {
+            margin-bottom: 10px;
+            color: #303545;
+        }
+        
+        .mode-card p {
+            color: #6f7583;
+            font-size: 14px;
+        }
+        
+        /* Features section */
+        .features-section {
+            padding: 50px 0;
+            background: #fff;
+        }
+        
+        .features-section h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 40px;
+            color: #4257b2;
+        }
+        
+        .features-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background: #f6f7fb;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(66,87,178,0.07);
+            padding: 30px;
+            width: 300px;
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card h3 {
+            color: #303545;
+            margin-bottom: 10px;
+        }
+        
+        .feature-card p {
+            color: #6f7583;
+        }
+        
+        /* Flashcards section */
+        .flashcards-section {
+            padding: 50px;
+            background-color: white;
+        }
+        
+        .flashcards-section h2 {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .flashcard-container {
+            max-width: 800px;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        
+        .flashcard {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            border-radius: 12px;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .flashcard-front {
+            background-color: #4257b2;
+            color: white;
+        }
+        
+        .flashcard-back {
+            background-color: #f6f7fb;
+            color: #303545;
+            transform: rotateY(180deg);
+            border: 2px solid #e6e6ef;
+        }
+        
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .navigation-btns {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .nav-btn {
+            padding: 10px 25px;
+            background-color: #4257b2;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        /* Create set section */
+        .create-set {
+            padding: 70px 50px;
+            text-align: center;
+            background-color: #f6f7fb;
+        }
+        
+        .create-set h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        
+        .create-set p {
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .create-btn {
+            padding: 15px 35px;
+            background-color: #ffcd1f;
+            color: #303545;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .create-btn:hover {
+            background-color: #ffc400;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #303545;
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: #d9dde8;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            color: #a2a5b9;
+            font-size: 14px;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+            }
+            
+            .nav-links {
+                order: 3;
+                width: 100%;
+                margin-top: 15px;
+                justify-content: center;
+            }
+            
+            .hero {
+                padding: 50px 20px;
+            }
+            
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .study-modes, .flashcards-section, .create-set {
+                padding: 30px 20px;
+            }
+            
+            .modes-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .mode-card {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="#" class="logo">StudyCards</a>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Subjects</a></li>
+            <li><a href="#">Library</a></li>
+            <li><a href="#">Solutions</a></li>
+        </ul>
+        <div class="auth-buttons">
+            <button class="login-btn">Log in</button>
+            <button class="signup-btn">Sign up</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Learn anything. For free.</h1>
+        <p>Join over 50 million students using StudyCards to master concepts, improve grades, and study more effectively.</p>
+        <div class="search-container">
+            <input type="text" placeholder="Search for a topic, subject, or keyword">
+            <span class="search-icon">🔍</span>
+        </div>
+    </section>
+
+    <!-- Study Modes & Features Section -->
+    <section class="study-modes features-section" style="padding:50px 0; background:#fff;">
+        <h2 style="text-align:center; font-size:32px; margin-bottom:40px; color:#4257b2;">Unlock Your Learning Adventure</h2>
+        <div class="modes-container features-container" style="display:flex; flex-wrap:nowrap; justify-content:center; gap:30px; max-width:1200px; margin:0 auto;">
+            <a href="http://203.190.9.175:7090/true_false_game" class="mode-card feature-card" id="myth-busting" style="text-decoration:none; color:inherit;">
+                <div class="mode-icon feature-icon">📇</div>
+                <h3>Myth Busting Game</h3>
+                <p>Review cards with terms and definitions to master key concepts and bust common myths.</p>
+            </a>
+            <a href="/myth-check/" class="mode-card feature-card" id="fact-checker" style="text-decoration:none; color:inherit;">
+                <div class="mode-icon feature-icon">🔎</div>
+                <h3>Fact Checker</h3>
+                <p>Instantly verify facts and debunk myths with our AI-powered fact-checking tool.</p>
+            </a>
+            <a href="http://203.190.9.175:7090/visualize" class="mode-card feature-card" id="visualization-lab" style="text-decoration:none; color:inherit;">
+                <div class="mode-icon feature-icon">🧪</div>
+                <h3>Visualization Lab</h3>
+                <p>Explore, simulate, and understand any concept visually with AI-powered interactive simulations.</p>
+            </a>
+            <a href="http://203.190.9.175:7090/scientist" class="mode-card feature-card" id="roleplay" style="text-decoration:none; color:inherit;">
+                <div class="mode-icon feature-icon">🎭</div>
+                <h3>Roleplay as Scientists</h3>
+                <p>Engage in interactive scenarios and roleplay to reinforce your scientific knowledge.</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-links">
+            <div class="footer-column">
+                <h3>About</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">How It Works</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>For Students</h3>
+                <ul>
+                    <li><a href="#">Flashcards</a></li>
+                    <li><a href="#">Learn</a></li>
+                    <li><a href="#">Solutions</a></li>
+                    <li><a href="#">StudyCards Plus</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>For Teachers</h3>
+                <ul>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Premium</a></li>
+                    <li><a href="#">Resources</a></li>
+                    <li><a href="#">Help Center</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                    <li><a href="#">Help</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2025 StudyCards. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        // Simple JavaScript for flashcard functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashcards = document.querySelectorAll('.flashcard');
+            flashcards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.classList.toggle('flipped');
+                });
+            });
+
+            // Navigation buttons functionality could be added here
+            // This is just a simple demo without actual navigation
+        });
+
+        document.getElementById('flashcards').addEventListener('click', function() {
+            window.location.href = '/true_false_game';
+        });
+        document.getElementById('visualize').addEventListener('click', function() {
+            window.location.href = '/visualize';
+        });
+
+    </script>
+</body>
+</html>

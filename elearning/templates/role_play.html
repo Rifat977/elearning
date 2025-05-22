@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scientists Role Play Game</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans Bengali', 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0F172A, #1E293B);
+      min-height: 100vh;
+      color: #F8FAFC;
+    }
+    .app-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .trust-bar {
+      background: #22223b;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 18px;
+      margin-top: 0.5rem;
+    }
+    .trust-bar-inner {
+      background: linear-gradient(90deg, #10B981, #7C3AED);
+      height: 100%;
+      transition: width 0.5s;
+    }
+    .loader {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid #7C3AED;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container" x-data="mythChecker()">
+    <div class="mb-8">
+        <!-- Navigation Bar -->
+        <nav class="flex justify-center mb-6 bg-gray-900 bg-opacity-80 rounded-xl px-6 py-4 shadow-lg">
+            <ul class="flex flex-wrap gap-6 text-base font-semibold">
+                <li><a href="/" class="text-gray-200 hover:text-purple-400 transition">Home Base</a></li>
+                <li><a href="/myth-check/" class="text-gray-200 hover:text-purple-400 transition">Myth Detective</a></li>
+                <li><a href="/visualize" class="text-gray-200 hover:text-purple-400 transition">See the Unseen</a></li>
+                <li><a href="/true_false_game/" class="text-gray-200 hover:text-purple-400 transition">Challenge Cards</a></li>
+                <li><a href="/role_play/" class="text-purple-400 transition">Role Play</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="mb-8 text-center">
+      <h1 class="text-3xl font-bold mb-2 text-purple-400">সাইন্স্টস রোল প্লে</h1>
+      <p class="text-gray-300">আপনি একজন সাইন্স্ট এবং আপনার প্রশ্ন বা দাবিটি যাচাই করুন।</p>
+    </div>
+    <div class="input-container bg-gray-800 bg-opacity-80 p-6 rounded-xl shadow-lg mb-8">
+      <label for="myth-input" class="block text-sm font-medium text-gray-400 mb-2">আপনার প্রশ্ন/গুজব লিখুন</label>
+      <div class="flex flex-col md:flex-row gap-4">
+        <input id="myth-input" type="text" x-model="userMyth" @keydown.enter="submitMyth" placeholder="যেমন: ৫জি কি ক্যান্সার সৃষ্টি করে?" class="flex-1 bg-gray-900 border border-gray-700 rounded-md py-3 px-4 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500">
+        <button @click="submitMyth" :disabled="isLoading || userMyth.trim() === ''" :class="{'opacity-50 cursor-not-allowed': isLoading || userMyth.trim() === ''}" class="btn bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-md px-6 py-3 transition-all flex items-center justify-center gap-2">
+          <span x-show="!isLoading">তথ্য যাচাই করুন</span>
+          <span x-show="isLoading" class="flex items-center gap-2"><div class="loader w-5 h-5"></div> যাচাই হচ্ছে...</span>
+        </button>
+      </div>
+    </div>
+    <template x-if="result">
+      <div class="result-container bg-gray-900 bg-opacity-90 rounded-xl p-6 shadow-lg mt-6 animate-fade-in">
+        
+      </div>
+    </template>
+    <template x-if="error">
+      <div class="bg-red-800 bg-opacity-80 text-white rounded-lg p-4 mt-6 text-center">
+        <span x-text="error"></span>
+      </div>
+    </template>
+    <div class="mt-12 text-center text-sm text-gray-500">
+      <p>© ২০২৫ সাইন্স্টস রোল প্লে - তথ্য যাচাই করা হচ্ছে AI ও ওয়েব উৎসের মাধ্যমে</p>
+    </div>
+  </div>
+  <script>
+    
+  </script>
+</body>
+</html>

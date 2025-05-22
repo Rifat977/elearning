@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>True/False Flashcard Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+      .flashcard-container { perspective: 1000px; }
+      .flashcard { transition: transform 0.6s; transform-style: preserve-3d; position: relative; }
+      .flipped { transform: rotateY(180deg); }
+      .front, .back { backface-visibility: hidden; }
+      .back { transform: rotateY(180deg); }
+      .app-container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen text-gray-100">
+    <div class="app-container">
+        <!-- Navigation Bar -->
+        <nav class="flex justify-center mb-8 bg-gray-900 bg-opacity-80 rounded-xl px-6 py-4 shadow-lg">
+            <ul class="flex flex-wrap gap-6 text-base font-semibold">
+                <li><a href="/" class="text-gray-200 hover:text-purple-400 transition">Home Base</a></li>
+                <li><a href="/myth-check/" class="text-gray-200 hover:text-purple-400 transition">Myth Detective</a></li>
+                <li><a href="/visualize" class="text-gray-200 hover:text-purple-400 transition">See the Unseen</a></li>
+                <li><a href="/true_false_game/" class="text-purple-400 transition">Challenge Cards</a></li>
+            </ul>
+        </nav>
+        <!-- Headline Section -->
+        <div class="mb-8 text-center">
+            <h1 class="text-3xl font-bold mb-2 text-purple-400">True/False Flashcard Game</h1>
+            <p class="text-gray-300">Test your knowledge across science and more. Flip, answer, and star your favorite cards!</p>
+        </div>
+        <!-- Flashcard Game Container -->
+        <div class="bg-gray-800 bg-opacity-90 rounded-2xl shadow-xl p-6 relative" x-data="{ loading: true, showFeedback: false, feedbackType: '', feedbackMsg: '', feedbackIcon: '' }" x-init="setTimeout(() => loading = false, 600)">
+            <!-- Loading Spinner -->
+            <div x-show="loading" class="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-20">
+                <div class="flex flex-col items-center">
+                    <svg class="animate-spin h-10 w-10 text-purple-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>
+                    <span class="text-purple-300 text-lg">Loading flashcards...</span>
+                </div>
+            </div>
+            <div x-show="!loading" class="relative">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
+                    <div class="flex gap-2 flex-wrap">
+                        <button class="option-btn px-4 py-2 rounded-lg text-sm font-medium focus:outline-none transition-all" data-mode="all">All cards</button>
+                        <button class="option-btn px-4 py-2 rounded-lg text-sm font-medium focus:outline-none transition-all" data-mode="starred">Starred</button>
+                        <button class="option-btn px-4 py-2 rounded-lg text-sm font-medium focus:outline-none transition-all" data-mode="unseen">Unseen</button>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm">Card <span id="current-card" class="font-bold">1</span> of <span id="total-cards" class="font-bold">10</span></span>
+                        <button class="text-yellow-400 text-2xl focus:outline-none transition-transform duration-200" id="star-card" title="Star this card" aria-label="Star this card">⭐</button>
+                    </div>
+                </div>
+                <div class="w-full h-2 bg-gray-700 rounded mb-6">
+                    <div class="bg-purple-500 h-2 rounded transition-all duration-300" id="progress-bar" style="width:0%"></div>
+                </div>
+                <!-- Feedback Message -->
+                <template x-if="showFeedback">
+                    <div class="flex items-center justify-center mb-2 animate-fade-in">
+                        <span class="text-2xl mr-2" x-text="feedbackIcon"></span>
+                        <span class="text-lg font-semibold" :class="feedbackType === 'correct' ? 'text-green-400' : 'text-red-400'" x-text="feedbackMsg"></span>
+                    </div>
+                </template>
+                <!-- Progress Indicator -->
+                <div class="text-center text-gray-400 text-sm mb-2">
+                    <span id="progress-indicator">1 / 10</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <div class="flashcard-container w-full max-w-2xl mb-6" style="perspective:1200px;">
+                        <div class="flashcard relative w-full h-80 cursor-pointer select-none flex flex-col justify-between p-8" id="flashcard" tabindex="0" aria-label="Flashcard" role="button" style="box-shadow:0 8px 32px rgba(124,58,237,0.12); border-radius:2rem;">
+                            <!-- Front Side -->
+                            <div class="front absolute w-full h-full flex flex-col items-center justify-center bg-gray-900 rounded-3xl shadow-lg text-xl font-semibold transition-transform duration-500 px-6 py-10" style="backface-visibility:hidden;">
+                                <p id="question-text" class="mb-8 text-center leading-snug">Loading question...</p>
+                                <div class="flex gap-4 w-full justify-center">
+                                    <button class="answer-btn true flex-1 py-4 rounded-lg font-semibold text-sm bg-green-600 hover:bg-green-700 text-white transition focus:ring-2 focus:ring-green-400" id="true-btn" aria-label="True">TRUE</button>
+                                    <button class="answer-btn false flex-1 py-4 rounded-lg font-semibold text-sm bg-red-600 hover:bg-red-700 text-white transition focus:ring-2 focus:ring-red-400" id="false-btn" aria-label="False">FALSE</button>
+                                </div>
+                            </div>
+                
+                            <!-- Back Side -->
+                            <div class="back absolute w-full h-full flex items-center justify-center bg-gray-800 rounded-3xl shadow-lg text-base transition-transform duration-500 px-6 py-10" style="backface-visibility:hidden; transform:rotateY(180deg);">
+                                <p id="explanation-text" class="text-center leading-snug">Loading answer...</p>
+                            </div>
+                        </div>
+                        <div class="flip-hint text-gray-400 text-sm mt-3">Tap or press Enter/Space to flip</div>
+                    </div>
+                
+                    <div class="flex w-full max-w-2xl justify-between mb-4">
+                        <button class="btn btn-outline px-4 py-1.5 rounded-md border border-purple-400 text-purple-400 hover:bg-purple-700 hover:text-white text-sm transition focus:ring-2 focus:ring-purple-400" id="prev-btn" aria-label="Previous">Previous</button>
+                        <button class="btn btn-primary px-4 py-1.5 rounded-md bg-purple-600 text-white hover:bg-purple-800 text-sm transition focus:ring-2 focus:ring-purple-400" id="next-btn" aria-label="Next">Next</button>
+                    </div>
+                
+                    <div class="w-full flex justify-center" id="restart-container" style="display:none;">
+                        <button class="btn btn-primary px-6 py-2 rounded-md bg-purple-700 text-white hover:bg-purple-900 text-sm transition focus:ring-2 focus:ring-purple-400" id="restart-btn">Restart</button>
+                    </div>
+                </div>                
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const flashcards = JSON.parse('{{ flashcards|escapejs }}');
+            let currentCardIndex = 0;
+            let currentMode = 'all';
+            let filteredCards = [...flashcards];
+            const flashcardElement = document.getElementById('flashcard');
+            const questionText = document.getElementById('question-text');
+            const explanationText = document.getElementById('explanation-text');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const currentCardElement = document.getElementById('current-card');
+            const totalCardsElement = document.getElementById('total-cards');
+            const progressBar = document.getElementById('progress-bar');
+            const starCardBtn = document.getElementById('star-card');
+            const optionBtns = document.querySelectorAll('.option-btn');
+            const trueBtn = document.getElementById('true-btn');
+            const falseBtn = document.getElementById('false-btn');
+            function init() {
+                optionBtns[0].classList.add('bg-purple-700','text-white');
+                updateFilteredCards();
+                updateCard();
+                updateTotalCards();
+                updateProgressBar();
+            }
+            function updateFilteredCards() {
+                switch(currentMode) {
+                    case 'starred':
+                        filteredCards = flashcards.filter(card => card.starred);
+                        break;
+                    case 'unseen':
+                        filteredCards = flashcards.filter(card => !card.seen);
+                        break;
+                    default:
+                        filteredCards = [...flashcards];
+                }
+                if (currentCardIndex >= filteredCards.length) {
+                    currentCardIndex = filteredCards.length > 0 ? filteredCards.length - 1 : 0;
+                }
+            }
+            function updateCard() {
+                if (filteredCards.length === 0) {
+                    questionText.textContent = "No cards available in this filter";
+                    explanationText.textContent = "Try a different filter";
+                    return;
+                }
+                const card = filteredCards[currentCardIndex];
+                questionText.textContent = card.question;
+                explanationText.textContent = card.explanation || "No explanation available";
+                starCardBtn.classList.toggle('text-yellow-400', card.starred);
+                starCardBtn.classList.toggle('opacity-100', card.starred);
+                starCardBtn.classList.toggle('opacity-40', !card.starred);
+                if (!card.seen) {
+                    const originalIndex = flashcards.findIndex(c => c === card);
+                    if (originalIndex !== -1) {
+                        flashcards[originalIndex].seen = true;
+                    }
+                }
+                currentCardElement.textContent = currentCardIndex + 1;
+                flashcardElement.classList.remove('flipped');
+                updateProgressBar();
+            }
+            function updateTotalCards() {
+                totalCardsElement.textContent = filteredCards.length;
+            }
+            function updateProgressBar() {
+                const progress = ((currentCardIndex + 1) / filteredCards.length) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+            flashcardElement.addEventListener('click', function() {
+                this.classList.toggle('flipped');
+            });
+            prevBtn.addEventListener('click', function() {
+                if (currentCardIndex > 0) {
+                    currentCardIndex--;
+                    updateCard();
+                }
+            });
+            nextBtn.addEventListener('click', function() {
+                if (currentCardIndex < filteredCards.length - 1) {
+                    currentCardIndex++;
+                    updateCard();
+                }
+            });
+            starCardBtn.addEventListener('click', function() {
+                if (filteredCards.length === 0) return;
+                const card = filteredCards[currentCardIndex];
+                const originalIndex = flashcards.findIndex(c => c === card);
+                if (originalIndex !== -1) {
+                    flashcards[originalIndex].starred = !flashcards[originalIndex].starred;
+                }
+                updateCard();
+                if (currentMode === 'starred') {
+                    updateFilteredCards();
+                    updateTotalCards();
+                    updateCard();
+                }
+            });
+            optionBtns.forEach((btn, idx) => {
+                btn.addEventListener('click', function() {
+                    optionBtns.forEach(b => b.classList.remove('bg-purple-700','text-white'));
+                    this.classList.add('bg-purple-700','text-white');
+                    currentMode = this.dataset.mode;
+                    currentCardIndex = 0;
+                    updateFilteredCards();
+                    updateTotalCards();
+                    updateCard();
+                });
+            });
+            trueBtn.addEventListener('click', function() {
+                if (filteredCards.length === 0) return;
+                const card = filteredCards[currentCardIndex];
+                if (card.answer === "True") {
+                    this.classList.add('bg-green-600','text-white');
+                    setTimeout(() => {
+                        this.classList.remove('bg-green-600','text-white');
+                        if (currentCardIndex < filteredCards.length - 1) {
+                            currentCardIndex++;
+                            updateCard();
+                        }
+                    }, 800);
+                } else {
+                    this.classList.add('bg-red-600','text-white');
+                    setTimeout(() => {
+                        this.classList.remove('bg-red-600','text-white');
+                        flashcardElement.classList.add('flipped');
+                    }, 800);
+                }
+            });
+            falseBtn.addEventListener('click', function() {
+                if (filteredCards.length === 0) return;
+                const card = filteredCards[currentCardIndex];
+                if (card.answer === "False") {
+                    this.classList.add('bg-green-600','text-white');
+                    setTimeout(() => {
+                        this.classList.remove('bg-green-600','text-white');
+                        if (currentCardIndex < filteredCards.length - 1) {
+                            currentCardIndex++;
+                            updateCard();
+                        }
+                    }, 800);
+                } else {
+                    this.classList.add('bg-red-600','text-white');
+                    setTimeout(() => {
+                        this.classList.remove('bg-red-600','text-white');
+                        flashcardElement.classList.add('flipped');
+                    }, 800);
+                }
+            });
+            init();
+        });
+    </script>
+</body>
+</html>
