@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claim Analytics Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="min-h-screen p-6 bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+
+  <div id="claim-analytics" class="max-w-7xl mx-auto space-y-6">
+    <!-- Header + Filters -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+      <h1 class="text-3xl font-semibold mb-4 sm:mb-0">ক্লেইম অ্যানালাইটিকস</h1>
+      <div class="flex space-x-2">
+        <div>
+          <label class="block text-sm">শুরু</label>
+          <input type="date" class="mt-1 p-2 bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-700" />
+        </div>
+        <div>
+          <label class="block text-sm">শেষ</label>
+          <input type="date" class="mt-1 p-2 bg-white dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-700" />
+        </div>
+        <button class="mt-6 sm:mt-5 px-4 py-2 bg-gray-600 dark:bg-gray-500 text-white rounded">প্রয়োগ</button>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h2 class="text-sm font-medium">মোট ক্লেইম</h2>
+        <p class="text-2xl font-bold mt-2">১২০০</p>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h2 class="text-sm font-medium">গড় বিশ্বাস স্কোর</h2>
+        <p class="text-2xl font-bold mt-2">৬৫%</p>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h2 class="text-sm font-medium">যাচাইকৃত ক্লেইম</h2>
+        <p class="text-2xl font-bold mt-2">৯৫০</p>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h2 class="text-sm font-medium">ক্লেইমার সংখ্যা</h2>
+        <p class="text-2xl font-bold mt-2">২৪০</p>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h2 class="text-sm font-medium">এই মাসের ক্লেইম</h2>
+        <p class="text-2xl font-bold mt-2">১৫০</p>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h2 class="text-sm font-medium">গড় যাচাইকরণ সময়</h2>
+        <p class="text-2xl font-bold mt-2">৪৫ ঘণ্টা</p>
+      </div>
+    </div>
+
+    <!-- Topics & Top Submitters -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-medium mb-3">সর্বাধিক সাধারণ বিষয়</h2>
+        <ul class="list-disc list-inside space-y-1">
+          <li>স্বাস্থ্য (৩০%)</li>
+          <li>জলবায়ু (২৫%)</li>
+          <li>প্রযুক্তি (২০%)</li>
+          <li>শিক্ষা (১৫%)</li>
+          <li>অন্যান্য (১০%)</li>
+        </ul>
+      </div>
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-medium mb-3">সর্বোচ্চ জমাদাতা</h2>
+        <ol class="list-decimal list-inside space-y-1">
+          <li>রাফায়েল (৫০টি)</li>
+          <li>সাবিনা (৪৫টি)</li>
+          <li>জাহিদ (৪০টি)</li>
+          <li>লাবিবা (৩৫টি)</li>
+          <li>তারেক (৩০টি)</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Trust Score Distribution -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-medium mb-4">বিশ্বাস স্কোর বিতরণ</h2>
+        <canvas id="trustScoreChart"></canvas>
+      </div>
+      <!-- Verdict Breakdown -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-medium mb-4">ফলাফল বিভাজন</h2>
+        <canvas id="verdictChart"></canvas>
+      </div>
+      <!-- Claims Over Time -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-medium mb-4">সময়ের সাথে ক্লেইম</h2>
+        <canvas id="claimsTimeChart"></canvas>
+      </div>
+      <!-- Claims by Topic -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-lg font-medium mb-4">বিষয় অনুযায়ী ক্লেইম</h2>
+        <canvas id="topicChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent Claims Table -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow overflow-x-auto">
+      <h2 class="text-lg font-medium mb-4">সাম্প্রতিক ক্লেইমসমূহ</h2>
+      <table class="min-w-full table-auto">
+        <thead>
+          <tr class="bg-gray-200 dark:bg-gray-700">
+            <th class="px-4 py-2">ID</th>
+            <th class="px-4 py-2">বিষয়</th>
+            <th class="px-4 py-2">বিশ্বাস স্কোর</th>
+            <th class="px-4 py-2">ফলাফল</th>
+            <th class="px-4 py-2">তারিখ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="border px-4 py-2">101</td>
+            <td class="border px-4 py-2">জলবায়ু</td>
+            <td class="border px-4 py-2">৮০%</td>
+            <td class="border px-4 py-2">সত্য</td>
+            <td class="border px-4 py-2">২০২৫-০৫-২০</td>
+          </tr>
+          <tr class="bg-gray-50 dark:bg-gray-800">
+            <td class="border px-4 py-2">102</td>
+            <td class="border px-4 py-2">স্বাস্থ্য</td>
+            <td class="border px-4 py-2">৩৫%</td>
+            <td class="border px-4 py-2">মিথ্যা</td>
+            <td class="border px-4 py-2">২০২৫-০৫-১৯</td>
+          </tr>
+          <tr>
+            <td class="border px-4 py-2">103</td>
+            <td class="border px-4 py-2">প্রযুক্তি</td>
+            <td class="border px-4 py-2">৫৫%</td>
+            <td class="border px-4 py-2">আংশিক সত্য</td>
+            <td class="border px-4 py-2">২০২৫-০৫-১৮</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Chart.js Initialization -->
+  <script>
+    // বিশ্বাস স্কোর বার চার্ট
+    new Chart(document.getElementById('trustScoreChart').getContext('2d'), {
+      type: 'bar', data: {
+        labels: ['০-২০', '২১-৪০', '৪১-৬০', '৬১-৮০', '৮১-১০০'],
+        datasets: [{ label: 'ক্লেইম সংখ্যা', data: [5,15,30,25,10], backgroundColor: '#64748B' }]
+      }, options: { responsive:true, scales:{ y:{ beginAtZero:true } } }
+    });
+
+    // ফলাফল পাই চার্ট
+    new Chart(document.getElementById('verdictChart').getContext('2d'), {
+      type: 'pie', data: {
+        labels:['সত্য','মিথ্যা','আংশিক সত্য'],
+        datasets:[{ data:[40,35,25], backgroundColor:['#CBD5E1','#64748B','#1E293B'] }]
+      }, options:{ responsive:true }
+    });
+
+    // সময়ের সাথে ক্লেইম লাইন চার্ট
+    new Chart(document.getElementById('claimsTimeChart').getContext('2d'), {
+      type: 'line', data: {
+        labels:['মে 1','মে 5','মে 10','মে 15','মে 20','মে 24'],
+        datasets:[{ label:'নতুন ক্লেইম', data:[10,20,15,30,25,35], fill:false, tension:0.3, borderColor:'#64748B' }]
+      }, options:{ responsive:true }
+    });
+
+    // বিষয় অনুযায়ী ক্লেইম ডোনাট চার্ট
+    new Chart(document.getElementById('topicChart').getContext('2d'), {
+      type: 'doughnut', data: {
+        labels:['স্বাস্থ্য','জলবায়ু','প্রযুক্তি','শিক্ষা','অন্যান্য'],
+        datasets:[{ data:[30,25,20,15,10], backgroundColor:['#CBD5E1','#94A3B8','#64748B','#475569','#1E293B'] }]
+      }, options:{ responsive:true }
+    });
+  </script>
+
+</body>
+</html>
